@@ -1,16 +1,12 @@
 const pool = require("../config/db");
 const bcrypt = require("bcryptjs");
 const jwt = require("jsonwebtoken");
+const sendEmail = require("../utils/sendEmail");
 
 // Register
 const register = async (req, res) => {
   try {
-    const {
-      name,
-      email,
-      mobile,
-      password,
-    } = req.body;
+    const { name, email, mobile, password } = req.body;
 
     const userExists = await pool.query(
       `
@@ -24,13 +20,11 @@ const register = async (req, res) => {
 
     if (userExists.rows.length > 0) {
       return res.status(400).json({
-        message:
-          "Email or Mobile Number already exists",
+        message: "Email or Mobile Number already exists",
       });
     }
 
-    const hashedPassword =
-      await bcrypt.hash(password, 10);
+    const hashedPassword = await bcrypt.hash(password, 10);
 
     const result = await pool.query(
       `
@@ -49,17 +43,32 @@ const register = async (req, res) => {
       email,
       mobile
       `,
-      [
-        name,
-        email,
-        mobile,
-        hashedPassword,
-      ]
+      [name, email, mobile, hashedPassword]
     );
 
+    // Welcome Email
+    try {
+      await sendEmail(
+        result.rows[0].email,
+        "Welcome to Champion Turf",
+        `Hello ${result.rows[0].name},
+
+Your Champion Turf account has been created successfully.
+
+You can now log in and start booking turfs.
+
+Regards,
+Champion Turf Team`
+      );
+    } catch (emailError) {
+      console.error(
+        "Welcome Email Error:",
+        emailError.message
+      );
+    }
+
     res.status(201).json({
-      message:
-        "User Registered Successfully",
+      message: "User Registered Successfully",
       user: result.rows[0],
     });
   } catch (error) {
@@ -74,11 +83,7 @@ const register = async (req, res) => {
 // Login
 const login = async (req, res) => {
   try {
-    const { mobile, password } =
-      req.body;
-
-    console.log("Login Request:");
-    console.log(req.body);
+    const { mobile, password } = req.body;
 
     const result = await pool.query(
       `
@@ -89,25 +94,18 @@ const login = async (req, res) => {
       [mobile]
     );
 
-    console.log(
-      "Users Found:",
-      result.rows
-    );
-
     if (result.rows.length === 0) {
       return res.status(400).json({
-        message:
-          "Invalid Mobile Number",
+        message: "Invalid Mobile Number",
       });
     }
 
     const user = result.rows[0];
 
-    const isMatch =
-      await bcrypt.compare(
-        password,
-        user.password
-      );
+    const isMatch = await bcrypt.compare(
+      password,
+      user.password
+    );
 
     if (!isMatch) {
       return res.status(400).json({
@@ -119,12 +117,36 @@ const login = async (req, res) => {
       {
         id: user.id,
       },
-      process.env.JWT_SECRET ||
-        "champion_turf_secret",
+      process.env.JWT_SECRET || "champion_turf_secret",
       {
         expiresIn: "1d",
       }
     );
+
+    // Login Alert Email
+    try {
+      await sendEmail(
+        user.email,
+        "Champion Turf Login Alert",
+        `Hello ${user.name},
+
+You have successfully logged in to Champion Turf.
+
+Login Time:
+${new Date().toLocaleString()}
+
+If this login was not performed by you,
+please reset your password immediately.
+
+Regards,
+Champion Turf Team`
+      );
+    } catch (emailError) {
+      console.error(
+        "Login Email Error:",
+        emailError.message
+      );
+    }
 
     res.status(200).json({
       message: "Login Successful",
