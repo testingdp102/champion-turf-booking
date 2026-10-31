@@ -1,3 +1,5 @@
+// src/utils/validation.js
+
 export const validateName = (name) => {
   if (!name || !name.trim()) {
     return "Name is required";
@@ -15,8 +17,7 @@ export const validateEmail = (email) => {
     return "Email is required";
   }
 
-  const emailRegex =
-    /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+  const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
   if (!emailRegex.test(email.trim())) {
     return "Please enter a valid email";

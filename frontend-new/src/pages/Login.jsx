@@ -1,54 +1,96 @@
 import { useState, useEffect } from "react";
-import { Link, useNavigate } from "react-router-dom";
 import API from "../services/api";
+import { useNavigate, Link } from "react-router-dom";
+import { FaFutbol } from "react-icons/fa";
 
 import {
+  validateName,
   validateEmail,
+  validateMobile,
   validatePassword,
+  validateConfirmPassword,
 } from "../utils/validation";
 
-export default function Login() {
+export default function Register() {
   const navigate = useNavigate();
 
-  const [form, setForm] = useState({
-    email: "",
-    password: "",
-  });
+  const [showPassword, setShowPassword] = useState(false);
+  const [showConfirmPassword, setShowConfirmPassword] =
+    useState(false);
 
-  const [errors, setErrors] = useState({
-    email: "",
-    password: "",
-  });
-
-  const [serverError, setServerError] =
+  const [loading, setLoading] = useState(false);
+  const [serverError, setServerError] = useState("");
+  const [successMessage, setSuccessMessage] =
     useState("");
 
-  const [showPassword, setShowPassword] =
-    useState(false);
+  const [errors, setErrors] = useState({
+    name: "",
+    email: "",
+    mobile: "",
+    password: "",
+    confirmPassword: "",
+  });
 
-  const [loading, setLoading] =
-    useState(false);
+  const [form, setForm] = useState({
+    name: "",
+    email: "",
+    mobile: "",
+    password: "",
+    confirmPassword: "",
+  });
 
   useEffect(() => {
     const token = localStorage.getItem("token");
 
     if (token) {
-      navigate("/dashboard", {
-        replace: true,
-      });
+      navigate("/dashboard");
     }
   }, [navigate]);
 
-  const validateField = (
-    name,
-    value
-  ) => {
+  const getPasswordStrength = () => {
+    const password = form.password;
+
+    if (!password) return null;
+
+    if (password.length < 6) {
+      return {
+        text: "Weak",
+        className: "text-danger",
+      };
+    }
+
+    if (password.length < 8) {
+      return {
+        text: "Medium",
+        className: "text-warning",
+      };
+    }
+
+    return {
+      text: "Strong",
+      className: "text-success",
+    };
+  };
+
+  const validateField = (name, value) => {
     switch (name) {
+      case "name":
+        return validateName(value);
+
       case "email":
         return validateEmail(value);
 
+      case "mobile":
+        return validateMobile(value);
+
       case "password":
         return validatePassword(value);
+
+      case "confirmPassword":
+        return validateConfirmPassword(
+          form.password,
+          value
+        );
 
       default:
         return "";
@@ -67,124 +109,168 @@ export default function Login() {
   const handleChange = (e) => {
     const { name, value } = e.target;
 
+    const updatedValue =
+      name === "mobile"
+        ? value.replace(/\D/g, "")
+        : value;
+
     setForm((prev) => ({
       ...prev,
-      [name]: value,
+      [name]: updatedValue,
     }));
 
     setServerError("");
 
     setErrors((prev) => ({
       ...prev,
-      [name]: validateField(name, value),
+      [name]: validateField(name, updatedValue),
     }));
+
+    if (
+      name === "password" &&
+      form.confirmPassword
+    ) {
+      setErrors((prev) => ({
+        ...prev,
+        confirmPassword:
+          validateConfirmPassword(
+            updatedValue,
+            form.confirmPassword
+          ),
+      }));
+    }
   };
 
   const validateForm = () => {
     const newErrors = {
+      name: validateName(form.name),
       email: validateEmail(form.email),
-      password: validatePassword(
-        form.password
-      ),
+      mobile: validateMobile(form.mobile),
+      password: validatePassword(form.password),
+      confirmPassword:
+        validateConfirmPassword(
+          form.password,
+          form.confirmPassword
+        ),
     };
 
     setErrors(newErrors);
 
-    return !Object.values(
-      newErrors
-    ).some((error) => error);
+    return !Object.values(newErrors).some(
+      (error) => error
+    );
   };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
 
     setServerError("");
+    setSuccessMessage("");
 
-    if (!validateForm()) {
-      return;
-    }
+    if (!validateForm()) return;
 
     try {
       setLoading(true);
 
       const response = await API.post(
-        "/auth/login",
+        "/auth/register",
         {
+          name: form.name.trim(),
           email: form.email.trim(),
+          mobile: form.mobile,
           password: form.password,
         }
       );
 
-      const { token, user } =
-        response.data;
-
-      if (!token || !user) {
-        throw new Error(
-          "Invalid login response"
-        );
-      }
-
-      localStorage.setItem(
-        "token",
-        token
+      setSuccessMessage(
+        response.data.message ||
+          "Registration successful!"
       );
 
-      localStorage.setItem(
-        "userId",
-        user.id
-      );
-
-      localStorage.setItem(
-        "name",
-        user.name
-      );
-
-      localStorage.setItem(
-        "email",
-        user.email || ""
-      );
-
-      navigate("/dashboard", {
-        replace: true,
+      setForm({
+        name: "",
+        email: "",
+        mobile: "",
+        password: "",
+        confirmPassword: "",
       });
-    } catch (error) {
-      if (!error.response) {
-        setServerError(
-          "Unable to connect to server. Please try again."
-        );
-      } else {
-        setServerError(
-          error.response?.data?.message ||
-            "Invalid email or password"
-        );
-      }
+
+      setErrors({
+        name: "",
+        email: "",
+        mobile: "",
+        password: "",
+        confirmPassword: "",
+      });
+
+      setTimeout(() => {
+        navigate("/login");
+      }, 1500);
+    } catch (err) {
+      setServerError(
+        err?.response?.data?.message ||
+          "Registration failed"
+      );
     } finally {
       setLoading(false);
     }
   };
 
+  const passwordStrength =
+    getPasswordStrength();
+
   return (
     <div
-      className="container d-flex justify-content-center align-items-center"
-      style={{ minHeight: "90vh" }}
+      style={{
+        minHeight: "100vh",
+        background:
+          "linear-gradient(135deg, #0f172a 0%, #166534 100%)",
+        display: "flex",
+        justifyContent: "center",
+        alignItems: "center",
+        padding: "16px",
+      }}
     >
       <div
-        className="card shadow-lg border-0"
+        className="card border-0"
         style={{
           width: "100%",
-          maxWidth: "450px",
-          borderRadius: "16px",
+          maxWidth: "550px",
+          borderRadius: "20px",
+          background: "rgba(255,255,255,0.95)",
+          backdropFilter: "blur(10px)",
+          boxShadow:
+            "0 25px 60px rgba(0,0,0,0.20)",
         }}
       >
-        <div className="card-body p-4">
+        <div className="card-body p-3 p-sm-4 p-md-5">
           <div className="text-center mb-4">
-            <h2 className="fw-bold">
-              Welcome Back
-            </h2>
+            <FaFutbol
+              size={55}
+              color="#16a34a"
+              className="mb-3"
+            />
 
-            <p className="text-muted">
-              Login to Champion Turf
+            <h1
+              className="fw-bold"
+              style={{ color: "#166534" }}
+            >
+              Join Champion Turf
+            </h1>
+
+            <p className="text-muted mb-0">
+  account and start booking
             </p>
+
+            <div
+              className="mt-2"
+              style={{
+                color: "#16a34a",
+                fontWeight: "600",
+              }}
+            >
+              ⚽ Join the Champions
+            </div>
           </div>
 
           {serverError && (
@@ -193,31 +279,84 @@ export default function Login() {
             </div>
           )}
 
+          {successMessage && (
+            <div className="alert alert-success">
+              {successMessage}
+            </div>
+          )}
+
           <form onSubmit={handleSubmit}>
             <div className="mb-3">
               <label className="form-label fw-semibold">
-                Email Address
+                Name
+              </label>
+
+              <input
+                type="text"
+                name="name"
+                value={form.name}
+                placeholder="Enter Name"
+                onChange={handleChange}
+                onBlur={handleBlur}
+                disabled={loading}
+                className={`form-control ${
+                  errors.name ? "is-invalid" : ""
+                }`}
+              />
+
+              <div className="invalid-feedback">
+                {errors.name}
+              </div>
+            </div>
+
+            <div className="mb-3">
+              <label className="form-label fw-semibold">
+                Email
               </label>
 
               <input
                 type="email"
                 name="email"
+                value={form.email}
+                placeholder="Enter Email"
+                onChange={handleChange}
+                onBlur={handleBlur}
+                disabled={loading}
                 className={`form-control ${
-                  errors.email
+                  errors.email ? "is-invalid" : ""
+                }`}
+              />
+
+              <div className="invalid-feedback">
+                {errors.email}
+              </div>
+            </div>
+
+            <div className="mb-3">
+              <label className="form-label fw-semibold">
+                Mobile Number
+              </label>
+
+              <input
+                type="tel"
+                name="mobile"
+                value={form.mobile}
+                placeholder="Enter Mobile Number"
+                onChange={handleChange}
+                onBlur={handleBlur}
+                maxLength={10}
+                inputMode="numeric"
+                disabled={loading}
+                className={`form-control ${
+                  errors.mobile
                     ? "is-invalid"
                     : ""
                 }`}
-                placeholder="Enter email"
-                value={form.email}
-                onChange        onBlur={handleBlur}
-                disabled={loading}
               />
 
-              {errors.email && (
-                <div className="invalid-feedback d-block">
-                  {errors.email}
-                </div>
-              )}
+              <div className="invalid-feedback">
+                {errors.mobile}
+              </div>
             </div>
 
             <div className="mb-3">
@@ -233,25 +372,23 @@ export default function Login() {
                       : "password"
                   }
                   name="password"
+                  value={form.password}
+                  placeholder="Enter Password"
+                  onChange={handleChange}
+                  onBlur={handleBlur}
+                  disabled={loading}
                   className={`form-control ${
                     errors.password
                       ? "is-invalid"
                       : ""
                   }`}
-                  placeholder="Enter password"
-                  value={form.password}
-                  onChange={handleChange}
-                  onBlur={handleBlur}
-                  disabled={loading}
                 />
 
                 <button
                   type="button"
                   className="btn btn-outline-secondary"
                   onClick={() =>
-                    setShowPassword(
-                      !showPassword
-                    )
+                    setShowPassword(!showPassword)
                   }
                 >
                   {showPassword
@@ -265,38 +402,102 @@ export default function Login() {
                   {errors.password}
                 </div>
               )}
+
+              {passwordStrength && (
+                <div
+                  className={`small mt-1 ${passwordStrength.className}`}
+                >
+                  Password Strength:{" "}
+                  {passwordStrength.text}
+                </div>
+              )}
             </div>
 
-            <div className="d-grid">
-              <button
-                type="submit"
-                className="btn btn-primary btn-lg"
-                disabled={loading}
-              >
-                {loading ? (
-                  <>
-                    <span
-                      className="spinner-border spinner-border-sm me-2"
-                      role="status"
-                    ></span>
-                    Logging In...
-                  </>
-                ) : (
-                  "Login"
-                )}
-              </button>
+            <div className="mb-4">
+              <label className="form-label fw-semibold">
+                Confirm Password
+              </label>
+
+              <div className="input-group">
+                <input
+                  type={
+                    showConfirmPassword
+                      ? "text"
+                      : "password"
+                  }
+                  name="confirmPassword"
+                  value={form.confirmPassword}
+                  placeholder="Confirm Password"
+                  onChange={handleChange}
+                  onBlur={handleBlur}
+                  disabled={loading}
+                  className={`form-control ${
+                    errors.confirmPassword
+                      ? "is-invalid"
+                      : ""
+                  }`}
+                />
+
+                <button
+                  type="button"
+                  className="btn btn-outline-secondary"
+                  onClick={() =>
+                    setShowConfirmPassword(
+                      !showConfirmPassword
+                    )
+                  }
+                >
+                  {showConfirmPassword
+                    ? "🙈"
+                    : "👁️"}
+                </button>
+              </div>
+
+              {errors.confirmPassword && (
+                <div className="text-danger small mt-1">
+                  {errors.confirmPassword}
+                </div>
+              )}
             </div>
+
+            <button
+              type="submit"
+              disabled={loading}
+              className="btn w-100"
+              style={{
+                background:
+                  "linear-gradient(90deg,#16a34a,#22c55e)",
+                color: "#fff",
+                border: "none",
+                borderRadius: "12px",
+                padding: "12px",
+                fontWeight: "600",
+              }}
+            >
+              {loading ? (
+                <>
+                  <span className="spinner-border spinner-border-sm me-2"></span>
+                  Registering...
+                </>
+              ) : (
+                "Register"
+              )}
+            </button>
           </form>
 
           <div className="text-center mt-4">
             <span className="text-muted">
-              Don't have an account?
+              Already have an account?
             </span>{" "}
             <Link
-              to="/register"
-              className="fw-semibold text-decoration-none"
+              to="/login"
+              style={{
+                color: "#16a34a",
+                textDecoration: "none",
+                fontWeight: "700",
+              }}
             >
-              Register Here
+              Login Here
             </Link>
           </div>
         </div>
