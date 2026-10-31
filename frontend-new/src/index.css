@@ -400,3 +400,23 @@ body.dark-mode .auth-link:hover {
     padding-right: 12px;
   }
 }
+.auth-page {
+  min-height: 100vh;
+  background: linear-gradient(
+    135deg,
+    #0f172a 0%,
+    #166534 100%
+  );
+  padding: 40px 15px;
+}
+
+.auth-card {
+  width: 100%;
+  max-width: 550px;
+  margin: 0 auto;
+  border: none;
+  border-radius: 20px;
+  background: rgba(255, 255, 255, 0.95);
+  backdrop-filter: blur(10px);
+  box-shadow: 0 25px 60px rgba(0, 0, 0, 0.2);
+}

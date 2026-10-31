@@ -2,6 +2,7 @@ import { useState, useEffect } from "react";
 import API from "../services/api";
 import { useNavigate, Link } from "react-router-dom";
 import { FaFutbol } from "react-icons/fa";
+
 import {
   validateName,
   validateEmail,
@@ -119,7 +120,10 @@ export default function Register() {
 
     setErrors((prev) => ({
       ...prev,
-      [name]: validateField(name, updatedValue),
+      [name]: validateField(
+        name,
+        updatedValue
+      ),
     }));
 
     if (
@@ -128,10 +132,11 @@ export default function Register() {
     ) {
       setErrors((prev) => ({
         ...prev,
-        confirmPassword: validateConfirmPassword(
-          updatedValue,
-          form.confirmPassword
-        ),
+        confirmPassword:
+          validateConfirmPassword(
+            updatedValue,
+            form.confirmPassword
+          ),
       }));
     }
   };
@@ -142,10 +147,11 @@ export default function Register() {
       email: validateEmail(form.email),
       mobile: validateMobile(form.mobile),
       password: validatePassword(form.password),
-      confirmPassword: validateConfirmPassword(
-        form.password,
-        form.confirmPassword
-      ),
+      confirmPassword:
+        validateConfirmPassword(
+          form.password,
+          form.confirmPassword
+        ),
     };
 
     setErrors(newErrors);
@@ -216,255 +222,279 @@ export default function Register() {
     }
   };
 
-  const passwordStrength = getPasswordStrength();
+  const passwordStrength =
+    getPasswordStrength();
 
   return (
     <div className="auth-page">
-      <div className="card auth-card">
-        <div className="card-body p-3 p-sm-4 p-md-5">
-          <div className="text-center mb-4">
-            <FaFutbol
-              size={55}
-              color="#16a34a"
-              className="mb-3 football-icon"
-            />
+      <div className="container">
+        <div className="row justify-content-center">
+          <div className="col-12 col-sm-10 col-md-8 col-lg-6">
+            <div className="card auth-card">
+              <div className="card-body p-3 p-sm-4 p-md-5">
+                <div className="text-center mb-4">
+                  <FaFutbol
+                    size={55}
+                    color="#16a34a"
+                    className="mb-3 football-icon"
+                  />
 
-            <h1 className="auth-heading">
-              Join Champion Turf
-            </h1>
+                  <h1 className="auth-heading">
+                    Join Champion Turf
+                  </h1>
 
-            <p className="text-muted mb-1">
-              Create your account and start booking
-            </p>
+                  <p className="text-muted mb-1">
+                    Create your account and start
+                    booking
+                  </p>
 
-            <div
-              style={{
-                color: "#16a34a",
-                fontWeight: "600",
-              }}
-            >
-              ⚽ Join the Champions
-            </div>
-          </div>
-
-          {serverError && (
-            <div className="alert alert-danger">
-              {serverError}
-            </div>
-          )}
-
-          {successMessage && (
-            <div className="alert alert-success">
-              {successMessage}
-            </div>
-          )}
-
-          <form onSubmit={handleSubmit}>
-            <div className="mb-3">
-              <label className="form-label fw-semibold">
-                Name
-              </label>
-
-              <input
-                type="text"
-                name="name"
-                value={form.name}
-                placeholder="Enter Name"
-                onChange={handleChange}
-                onBlur={handleBlur}
-                disabled={loading}
-                className={`form-control auth-input ${
-                  errors.name ? "is-invalid" : ""
-                }`}
-              />
-
-              {errors.name && (
-                <div className="invalid-feedback d-block">
-                  {errors.name}
+                  <div
+                    style={{
+                      color: "#16a34a",
+                      fontWeight: "600",
+                    }}
+                  >
+                    ⚽ Join the NDIG Turf !!!!!
+                  </div>
                 </div>
-              )}
-            </div>
 
-            <div className="mb-3">
-              <label className="form-label fw-semibold">
-                Email
-              </label>
+                {serverError && (
+                  <div className="alert alert-danger">
+                    {serverError}
+                  </div>
+                )}
 
-              <input
-                type="email"
-                name="email"
-                value={form.email}
-                placeholder="Enter Email"
-                onChange={handleChange}
-                onBlur={handleBlur}
-                disabled={loading}
-                className={`form-control auth-input ${
-                  errors.email ? "is-invalid" : ""
-                }`}
-              />
+                {successMessage && (
+                  <div className="alert alert-success">
+                    {successMessage}
+                  </div>
+                )}
 
-              {errors.email && (
-                <div className="invalid-feedback d-block">
-                  {errors.email}
+                <form onSubmit={handleSubmit}>
+                  <div className="mb-3">
+                    <label className="form-label fw-semibold">
+                      Name
+                    </label>
+
+                    <input
+                      type="text"
+                      name="name"
+                      value={form.name}
+                      placeholder="Enter Name"
+                      onChange={handleChange}
+                      onBlur={handleBlur}
+                      disabled={loading}
+                      className={`form-control auth-input ${
+                        errors.name
+                          ? "is-invalid"
+                          : ""
+                      }`}
+                    />
+{errors.name && (
+  <div className="invalid-feedback d-block">
+    {errors.name}
+  </div>
+)}
+                    
+                  </div>
+
+                  <div className="mb-3">
+                    <label className="form-label fw-semibold">
+                      Email
+                    </label>
+
+                    <input
+                      type="email"
+                      name="email"
+                      value={form.email}
+                      placeholder="Enter Email"
+                      onChange={handleChange}
+                      onBlur={handleBlur}
+                      disabled={loading}
+                      className={`form-control auth-input ${
+                        errors.email
+                          ? "is-invalid"
+                          : ""
+                      }`}
+                    />
+
+                    {errors.email && (
+                      <div className="invalid-feedback d-block">
+                        {errors.email}
+                      </div>
+                    )}
+                  </div>
+
+                  <div className="mb-3">
+                    <label className="form-label fw-semibold">
+                      Mobile Number
+                    </label>
+
+                    <input
+                      type="tel"
+                      name="mobile"
+                      value={form.mobile}
+                      placeholder="Enter Mobile Number"
+                      onChange={handleChange}
+                      onBlur={handleBlur}
+                      maxLength={10}
+                      inputMode="numeric"
+                      pattern="[0-9]*"
+                      disabled={loading}
+                      className={`form-control auth-input ${
+                        errors.mobile
+                          ? "is-invalid"
+                          : ""
+                      }`}
+                    />
+
+                    {errors.mobile && (
+                      <div className="invalid-feedback d-block">
+                        {errors.mobile}
+                      </div>
+                    )}
+                  </div>
+
+                  <div className="mb-3">
+                    <label className="form-label fw-semibold">
+                      Password
+                    </label>
+
+                    <div className="input-group">
+                      <input
+                        type={
+                          showPassword
+                            ? "text"
+                            : "password"
+                        }
+                        name="password"
+                        value={form.password}
+                        placeholder="Enter Password"
+                        onChange={handleChange}
+                        onBlur={handleBlur}
+                        disabled={loading}
+                        className={`form-control auth-input ${
+                          errors.password
+                            ? "is-invalid"
+                            : ""
+                        }`}
+                      />
+
+                      <button
+                        type="button"
+                        className="btn btn-outline-secondary"
+                        onClick={() =>
+                          setShowPassword(
+                            !showPassword
+                          )
+                        }
+                      >
+                        {showPassword
+                          ? "🙈"
+                          : "👁️"}
+                      </button>
+                    </div>
+
+                    {errors.password && (
+                      <div className="text-danger small mt-1">
+                        {errors.password}
+                      </div>
+                    )}
+
+                    {passwordStrength && (
+                      <div
+                        className={`small mt-1 ${passwordStrength.className}`}
+                      >
+                        Password Strength:{" "}
+                        {passwordStrength.text}
+                      </div>
+                    )}
+                  </div>
+
+                  <div className="mb-4">
+                    <label className="form-label fw-semibold">
+                      Confirm Password
+                    </label>
+
+                    <div className="input-group">
+                      <input
+                        type={
+                          showConfirmPassword
+                            ? "text"
+                            : "password"
+                        }
+                        name="confirmPassword"
+                        value={
+                          form.confirmPassword
+                        }
+                        placeholder="Confirm Password"
+                        onChange={handleChange}
+                        onBlur={handleBlur}
+                        disabled={loading}
+                        className={`form-control auth-input ${
+                          errors.confirmPassword
+                            ? "is-invalid"
+                            : ""
+                        }`}
+                      />
+
+                      <button
+                        type="button"
+                        className="btn btn-outline-secondary"
+                        onClick={() =>
+                          setShowConfirmPassword(
+                            !showConfirmPassword
+                          )
+                        }
+                      >
+                        {showConfirmPassword
+                          ? "🙈"
+                          : "👁️"}
+                      </button>
+                    </div>
+
+                    {errors.confirmPassword && (
+                      <div className="text-danger small mt-1">
+                        {
+                          errors.confirmPassword
+                        }
+                      </div>
+                    )}
+                  </div>
+
+                  <button
+                    type="submit"
+                    disabled={loading}
+                    className={`btn auth-btn w-100 ${
+                      loading
+                        ? "loading"
+                        : ""
+                    }`}
+                  >
+                    {loading ? (
+                      <>
+                        <span className="spinner-border spinner-border-sm me-2"></span>
+                        Registering...
+                      </>
+                    ) : (
+                      "Register"
+                    )}
+                  </button>
+                </form>
+
+                <div className="text-center mt-4">
+                  <span className="text-muted">
+                    Already have an account?
+                  </span>{" "}
+                  <Link
+                    to="/login"
+                    className="auth-link"
+                  >
+                    Login Here
+                  </Link>
                 </div>
-              )}
-            </div>
-
-            <div className="mb-3">
-              <label className="form-label fw-semibold">
-                Mobile Number
-              </label>
-
-              <input
-                type="tel"
-                name="mobile"
-                value={form.mobile}
-                placeholder="Enter Mobile Number"
-                onChange={handleChange}
-                onBlur={handleBlur}
-                maxLength={10}
-                inputMode="numeric"
-                pattern="[0-9]*"
-                disabled={loading}
-                className={`form-control auth-input ${
-                  errors.mobile ? "is-invalid" : ""
-                }`}
-              />
-
-              {errors.mobile && (
-                <div className="invalid-feedback d-block">
-                  {errors.mobile}
-                </div>
-              )}
-            </div>
-
-            <div className="mb-3">
-              <label className="form-label fw-semibold">
-                Password
-              </label>
-
-              <div className="input-group">
-                <input
-                  type={
-                    showPassword
-                      ? "text"
-                      : "password"
-                  }
-                  name="password"
-                  value={form.password}
-                  placeholder="Enter Password"
-                  onChange={handleChange}
-                  onBlur={handleBlur}
-                  disabled={loading}
-                  className={`form-control auth-input ${
-                    errors.password
-                      ? "is-invalid"
-                      : ""
-                  }`}
-                />
-
-                <button
-                  type="button"
-                  className="btn btn-outline-secondary"
-                  onClick={() =>
-                    setShowPassword(!showPassword)
-                  }
-                >
-                  {showPassword ? "🙈" : "👁️"}
-                </button>
               </div>
-
-              {errors.password && (
-                <div className="text-danger small mt-1">
-                  {errors.password}
-                </div>
-              )}
-
-              {passwordStrength && (
-                <div
-                  className={`small mt-1 ${passwordStrength.className}`}
-                >
-                  Password Strength:{" "}
-                  {passwordStrength.text}
-                </div>
-              )}
             </div>
-
-            <div className="mb-4">
-              <label className="form-label fw-semibold">
-                Confirm Password
-              </label>
-
-              <div className="input-group">
-                <input
-                  type={
-                    showConfirmPassword
-                      ? "text"
-                      : "password"
-                  }
-                  name="confirmPassword"
-                  value={form.confirmPassword}
-                  placeholder="Confirm Password"
-                  onChange={handleChange}
-                  onBlur={handleBlur}
-                  disabled={loading}
-                  className={`form-control auth-input ${
-                    errors.confirmPassword
-                      ? "is-invalid"
-                      : ""
-                  }`}
-                />
-
-                <button
-                  type="button"
-                  className="btn btn-outline-secondary"
-                  onClick={() =>
-                    setShowConfirmPassword(
-                      !showConfirmPassword
-                    )
-                  }
-                >
-                  {showConfirmPassword
-                    ? "🙈"
-                    : "👁️"}
-                </button>
-              </div>
-
-              {errors.confirmPassword && (
-                <div className="text-danger small mt-1">
-                  {errors.confirmPassword}
-                </div>
-              )}
-            </div>
-
-            <button
-              type="submit"
-              disabled={loading}
-              className={`btn auth-btn w-100 ${
-                loading ? "loading" : ""
-              }`}
-            >
-              {loading ? (
-                <>
-                  <span className="spinner-border spinner-border-sm me-2"></span>
-                  Registering...
-                </>
-              ) : (
-                "Register"
-              )}
-            </button>
-          </form>
-
-          <div className="text-center mt-4">
-            <span className="text-muted">
-              Already have an account?
-            </span>{" "}
-            <Link
-              to="/login"
-              className="auth-link"
-            >
-              Login Here
-            </Link>
           </div>
         </div>
       </div>
