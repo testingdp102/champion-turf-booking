@@ -1,12 +1,11 @@
 import axios from "axios";
 
 const API = axios.create({
-  baseURL: "http://localhost:5000/api",
+  baseURL: "https://champion-turf-backend.onrender.com/api",
   headers: {
     "Content-Type": "application/json",
   },
 });
-
 // Add JWT token automatically
 API.interceptors.request.use(
   (config) => {
