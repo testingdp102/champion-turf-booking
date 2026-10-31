@@ -2,7 +2,6 @@ import { useState, useEffect } from "react";
 import API from "../services/api";
 import { useNavigate, Link } from "react-router-dom";
 import { FaFutbol } from "react-icons/fa";
-
 import {
   validateName,
   validateEmail,
@@ -20,8 +19,7 @@ export default function Register() {
 
   const [loading, setLoading] = useState(false);
   const [serverError, setServerError] = useState("");
-  const [successMessage, setSuccessMessage] =
-    useState("");
+  const [successMessage, setSuccessMessage] = useState("");
 
   const [errors, setErrors] = useState({
     name: "",
@@ -48,18 +46,16 @@ export default function Register() {
   }, [navigate]);
 
   const getPasswordStrength = () => {
-    const password = form.password;
+    if (!form.password) return null;
 
-    if (!password) return null;
-
-    if (password.length < 6) {
+    if (form.password.length < 6) {
       return {
         text: "Weak",
         className: "text-danger",
       };
     }
 
-    if (password.length < 8) {
+    if (form.password.length < 8) {
       return {
         text: "Medium",
         className: "text-warning",
@@ -132,11 +128,10 @@ export default function Register() {
     ) {
       setErrors((prev) => ({
         ...prev,
-        confirmPassword:
-          validateConfirmPassword(
-            updatedValue,
-            form.confirmPassword
-          ),
+        confirmPassword: validateConfirmPassword(
+          updatedValue,
+          form.confirmPassword
+        ),
       }));
     }
   };
@@ -146,14 +141,11 @@ export default function Register() {
       name: validateName(form.name),
       email: validateEmail(form.email),
       mobile: validateMobile(form.mobile),
-      password: validatePassword(
-        form.password
+      password: validatePassword(form.password),
+      confirmPassword: validateConfirmPassword(
+        form.password,
+        form.confirmPassword
       ),
-      confirmPassword:
-        validateConfirmPassword(
-          form.password,
-          form.confirmPassword
-        ),
     };
 
     setErrors(newErrors);
@@ -184,6 +176,8 @@ export default function Register() {
         }
       );
 
+      const registeredMobile = form.mobile;
+
       setSuccessMessage(
         response.data.message ||
           "Registration successful!"
@@ -206,7 +200,11 @@ export default function Register() {
       });
 
       setTimeout(() => {
-        navigate("/login");
+        navigate("/login", {
+          state: {
+            mobile: registeredMobile,
+          },
+        });
       }, 1500);
     } catch (err) {
       setServerError(
@@ -218,8 +216,7 @@ export default function Register() {
     }
   };
 
-  const passwordStrength =
-    getPasswordStrength();
+  const passwordStrength = getPasswordStrength();
 
   return (
     <div className="auth-page">
@@ -229,7 +226,7 @@ export default function Register() {
             <FaFutbol
               size={55}
               color="#16a34a"
-              className="mb-3"
+              className="mb-3 football-icon"
             />
 
             <h1 className="auth-heading">
@@ -277,15 +274,15 @@ export default function Register() {
                 onBlur={handleBlur}
                 disabled={loading}
                 className={`form-control auth-input ${
-                  errors.name
-                    ? "is-invalid"
-                    : ""
+                  errors.name ? "is-invalid" : ""
                 }`}
               />
 
-              <div className="invalid-feedback">
-                {errors.name}
-              </div>
+              {errors.name && (
+                <div className="invalid-feedback d-block">
+                  {errors.name}
+                </div>
+              )}
             </div>
 
             <div className="mb-3">
@@ -300,16 +297,17 @@ export default function Register() {
                 placeholder="Enter Email"
                 onChange={handleChange}
                 onBlur={handleBlur}
-                disabled   className={`form-control auth-input ${
-                  errors.email
-                    ? "is-invalid"
-                    : ""
+                disabled={loading}
+                className={`form-control auth-input ${
+                  errors.email ? "is-invalid" : ""
                 }`}
               />
 
-              <div className="invalid-feedback">
-                {errors.email}
-              </div>
+              {errors.email && (
+                <div className="invalid-feedback d-block">
+                  {errors.email}
+                </div>
+              )}
             </div>
 
             <div className="mb-3">
@@ -326,17 +324,18 @@ export default function Register() {
                 onBlur={handleBlur}
                 maxLength={10}
                 inputMode="numeric"
+                pattern="[0-9]*"
                 disabled={loading}
                 className={`form-control auth-input ${
-                  errors.mobile
-                    ? "is-invalid"
-                    : ""
+                  errors.mobile ? "is-invalid" : ""
                 }`}
               />
 
-              <div className="invalid-feedback">
-                {errors.mobile}
-              </div>
+              {errors.mobile && (
+                <div className="invalid-feedback d-block">
+                  {errors.mobile}
+                </div>
+              )}
             </div>
 
             <div className="mb-3">
@@ -368,14 +367,10 @@ export default function Register() {
                   type="button"
                   className="btn btn-outline-secondary"
                   onClick={() =>
-                    setShowPassword(
-                      !showPassword
-                    )
+                    setShowPassword(!showPassword)
                   }
                 >
-                  {showPassword
-                    ? "🙈"
-                    : "👁️"}
+                  {showPassword ? "🙈" : "👁️"}
                 </button>
               </div>
 
@@ -445,7 +440,9 @@ export default function Register() {
             <button
               type="submit"
               disabled={loading}
-              className="btn auth-btn w-100"
+              className={`btn auth-btn w-100 ${
+                loading ? "loading" : ""
+              }`}
             >
               {loading ? (
                 <>
