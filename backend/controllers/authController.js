@@ -4,8 +4,7 @@ const pool = require("../config/db");
 
 require("dotenv").config();
 
-const JWT_SECRET =
-  process.env.JWT_SECRET;
+const JWT_SECRET = process.env.JWT_SECRET;
 
 if (!JWT_SECRET) {
   throw new Error(
@@ -46,48 +45,41 @@ const register = async (req, res) => {
       });
     }
 
-    const existingUser =
-      await pool.query(
-        "SELECT * FROM users WHERE email = $1",
-        [email]
-      );
+    const existingUser = await pool.query(
+      "SELECT * FROM users WHERE email = $1",
+      [email]
+    );
 
-    if (
-      existingUser.rows.length > 0
-    ) {
+    if (existingUser.rows.length > 0) {
       return res.status(400).json({
-        message:
-          "User already exists",
+        message: "User already exists",
       });
     }
 
     const hashedPassword =
       await bcrypt.hash(password, 10);
 
-    const result =
-      await pool.query(
-        `
-        INSERT INTO users
-        (name,email,mobile,password)
-        VALUES ($1,$2,$3,$4)
-        RETURNING id,name,email,mobile
+    const result = await pool.query(
+      `
+      INSERT INTO users
+      (name,email,mobile,password)
+      VALUES ($1,$2,$3,$4)
+      RETURNING id,name,email,mobile
       `,
-        [
-          name,
-          email,
-          mobile,
-          hashedPassword,
-        ]
-      );
+      [
+        name,
+        email,
+        mobile,
+        hashedPassword,
+      ]
+    );
 
     const user = result.rows[0];
 
-    const token =
-      generateToken(user);
+    const token = generateToken(user);
 
     res.status(201).json({
-      message:
-        "Registration successful",
+      message: "Registration successful",
       token,
       user,
     });
@@ -102,21 +94,25 @@ const register = async (req, res) => {
 
 const login = async (req, res) => {
   try {
-    const { email, password } =
+    const { mobile, password } =
       req.body;
 
-    const result =
-      await pool.query(
-        "SELECT * FROM users WHERE email = $1",
-        [email]
-      );
+    if (!mobile || !password) {
+      return res.status(400).json({
+        message:
+          "Mobile number and password are required",
+      });
+    }
 
-    if (
-      result.rows.length === 0
-    ) {
+    const result = await pool.query(
+      "SELECT * FROM users WHERE mobile = $1",
+      [mobile]
+    );
+
+    if (result.rows.length === 0) {
       return res.status(401).json({
         message:
-          "Invalid email or password",
+          "Invalid mobile number or password",
       });
     }
 
@@ -131,14 +127,14 @@ const login = async (req, res) => {
     if (!isMatch) {
       return res.status(401).json({
         message:
-          "Invalid email or password",
+          "Invalid mobile number or password",
       });
     }
 
-    const token =
-      generateToken(user);
+    const token = generateToken(user);
 
     res.json({
+      message: "Login Successful",
       token,
       user: {
         id: user.id,
