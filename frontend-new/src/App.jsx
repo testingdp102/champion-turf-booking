@@ -1,53 +1,63 @@
-import {
-  BrowserRouter,
-  Routes,
-  Route,
-} from "react-router-dom";
+import { BrowserRouter, Routes, Route } from "react-router-dom";
 
+import Navbar from "./components/Navbar";
+import ProtectedRoute from "./components/ProtectedRoute";
+
+import Home from "./pages/Home";
 import Login from "./pages/Login";
 import Register from "./pages/Register";
 import Dashboard from "./pages/Dashboard";
 import Booking from "./pages/Booking";
 import MyBookings from "./pages/MyBookings";
-import NotFound from "./pages/NotFound";
 
 function App() {
   return (
     <BrowserRouter>
-      <Routes>
-        <Route
-          path="/"
-          element={<Login />}
-        />
+      <Navbar />
 
-        <Route
-          path="/login"
-          element={<Login />}
-        />
+      <Routes>
+        {/* Public Routes */}
+        <Route path="/" element={<Home />} />
+
+        <Route path="/login" element={<Login />} />
 
         <Route
           path="/register"
           element={<Register />}
         />
 
+        {/* Protected Routes */}
         <Route
           path="/dashboard"
-          element={<Dashboard />}
+          element={
+            <ProtectedRoute>
+              <Dashboard />
+            </ProtectedRoute>
+          }
         />
 
         <Route
           path="/booking"
-          element={<Booking />}
+          element={
+            <ProtectedRoute>
+              <Booking />
+            </ProtectedRoute>
+          }
         />
 
         <Route
           path="/my-bookings"
-          element={<MyBookings />}
+          element={
+            <ProtectedRoute>
+              <MyBookings />
+            </ProtectedRoute>
+          }
         />
 
+        {/* Fallback */}
         <Route
           path="*"
-          element={<NotFound />}
+          element={<Home />}
         />
       </Routes>
     </BrowserRouter>
