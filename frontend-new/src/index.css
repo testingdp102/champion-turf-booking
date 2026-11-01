@@ -420,3 +420,23 @@ body.dark-mode .auth-link:hover {
   backdrop-filter: blur(10px);
   box-shadow: 0 25px 60px rgba(0, 0, 0, 0.2);
 }
+.register-link {
+  text-decoration: none;
+  font-weight: 700;
+  font-size: 16px;
+
+  background: linear-gradient(
+    90deg,
+    #16a34a,
+    #22c55e,
+    #3b82f6
+  );
+
+  background-clip: text;
+  -webkit-background-clip: text;
+
+  color: transparent;
+  -webkit-text-fill-color: transparent;
+
+  transition: all 0.3s ease;
+}
