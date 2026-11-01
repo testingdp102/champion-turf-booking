@@ -55,11 +55,15 @@ export default function Login() {
         res.data.token
       );
 
-      localStorage.setItem(
-        "user",
-        JSON.stringify(res.data.user)
-      );
+     localStorage.setItem(
+  "user",
+  JSON.stringify(res.data.user)
+);
 
+localStorage.setItem(
+  "userId",
+  res.data.user.id
+);
       console.log(
         "Stored Token:",
         localStorage.getItem("token")
