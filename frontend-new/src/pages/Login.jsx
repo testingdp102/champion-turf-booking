@@ -87,23 +87,42 @@ localStorage.setItem(
       <div className="container">
         <div className="row justify-content-center">
           <div className="col-12 col-sm-10 col-md-8 col-lg-5">
-            <div className="card auth-card">
-              <div className="card-body p-4 p-md-5">
-                <div className="text-center mb-4">
-                  <FaFutbol
-                    size={60}
-                    color="#16a34a"
-                    className="football-icon mb-3"
-                  />
+        <div className="card auth-card">
+  <div className="card-body p-4 p-md-5">
 
-                  <h1 className="auth-heading">
-                    Welcome Back
-                  </h1>
+    {/* ADD THIS BLOCK */}
+    <div className="text-center mb-3">
+      <span
+        style={{
+          background:
+            "linear-gradient(90deg,#16a34a,#22c55e)",
+          color: "white",
+          padding: "8px 16px",
+          borderRadius: "30px",
+          fontWeight: "600",
+          fontSize: "14px",
+        }}
+      >
+        ⚽ Nav Durga Indoor Games TURF !
+      </span>
+    </div>
 
-                  <p className="text-muted">
-                    Login to continue booking your turf
-                  </p>
-                </div>
+    <div className="text-center mb-4">
+      <FaFutbol
+        size={60}
+        color="#16a34a"
+        className="football-icon mb-3"
+      />
+
+      <h1 className="auth-heading">
+        Welcome Back
+      </h1>
+
+      <p className="auth-subtitle">
+        Book your favourite NDIG turf and get back in the game!
+      </p>
+
+    </div>
 
                 {error && (
                   <div className="alert alert-danger">
@@ -123,7 +142,7 @@ localStorage.setItem(
                       value={form.mobile}
                       onChange={handleChange}
                       maxLength={10}
-                      placeholder="Enter Mobile Number"
+                     placeholder="📱 Enter Mobile Number"
                       className="form-control auth-input"
                       required
                     />
@@ -144,7 +163,7 @@ localStorage.setItem(
                         name="password"
                         value={form.password}
                         onChange={handleChange}
-                        placeholder="Enter Password"
+                        placeholder="🔒 Enter Password"
                         className="form-control auth-input"
                         required
                       />
