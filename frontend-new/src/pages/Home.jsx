@@ -17,7 +17,7 @@ export default function Home() {
       >
         <div className="container">
           <h1 className="display-3 fw-bold mb-3">
-            ⚽ Champion Turf
+            ⚽ Nav Durga Indoor Games TURF !
           </h1>
 
           <p className="lead mb-4">
@@ -46,7 +46,7 @@ export default function Home() {
       {/* Features */}
       <div className="container py-5">
         <h2 className="text-center mb-5">
-          Why Choose Champion Turf?
+          Why Choose NDIG Turf?
         </h2>
 
         <div className="row g-4">
